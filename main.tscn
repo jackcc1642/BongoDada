@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwl6317g8joy6"]
+[gd_scene load_steps=3 format=3 uid="uid://cwl6317g8joy6"]
 
 [ext_resource type="Script" uid="uid://d1hseveef7g2h" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Texture2D" uid="uid://5h5mtkv7og0j" path="res://assets/images/pony_idle.png" id="2_0xm2m"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -10,3 +11,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ig7tw")
+
+[node name="PonyAvatar" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 330.0
+offset_right = 597.1357
+offset_bottom = 533.0
+texture = ExtResource("2_0xm2m")
+expand_mode = 1
