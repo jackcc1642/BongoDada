@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfyrd1p2k6672"
-path="res://.godot/imported/pony_hands1.png-a98f8a1b4c1312de57501af07094b3db.ctex"
+uid="uid://drrusb5fbhxbv"
+path="res://.godot/imported/pony_hands22.png-d367a473eaf7d6c84151865ba437f476.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/pony_hands1.png"
-dest_files=["res://.godot/imported/pony_hands1.png-a98f8a1b4c1312de57501af07094b3db.ctex"]
+source_file="res://assets/images/pony_hands22.png"
+dest_files=["res://.godot/imported/pony_hands22.png-d367a473eaf7d6c84151865ba437f476.ctex"]
 
 [params]
 
