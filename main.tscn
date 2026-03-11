@@ -1,8 +1,33 @@
-[gd_scene load_steps=4 format=3 uid="uid://cwl6317g8joy6"]
+[gd_scene load_steps=9 format=3 uid="uid://cwl6317g8joy6"]
 
 [ext_resource type="Script" uid="uid://d1hseveef7g2h" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Texture2D" uid="uid://sj1fo33pg4pw" path="res://assets/images/pony_keyboard.png" id="2_h2yge"]
 [ext_resource type="Texture2D" uid="uid://cs63rw5k6d8jh" path="res://assets/images/pony_hands11.png" id="3_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://5h5mtkv7og0j" path="res://assets/images/pony_idle.png" id="4_1bvp3"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h2yge"]
+bg_color = Color(1, 1, 0.9137255, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
+bg_color = Color(1, 1, 0.9137255, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1bvp3"]
+bg_color = Color(1, 1, 0.9137255, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7mycd"]
+bg_color = Color(0.9780825, 0.8708221, 0.9092022, 1)
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -39,18 +64,26 @@ offset = Vector2(300, 460)
 transform = Transform2D(1, 0, 0, 1, 300, 460)
 
 [node name="UnlockBUbble" type="Button" parent="UILayer"]
-modulate = Color(18.892157, 18.892157, 18.892157, 1)
 offset_left = 37.0
 offset_top = -28.0
 offset_right = 79.893616
 offset_bottom = 14.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_h2yge")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lquwl")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1bvp3")
 
 [node name="ItemIcon" type="TextureRect" parent="UILayer/UnlockBUbble"]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 4.0
-offset_right = 38.0
-offset_bottom = 37.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -0.8936157
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.9, 1.9)
+pivot_offset = Vector2(21, 21)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="BottomBar" type="HBoxContainer" parent="UILayer"]
 offset_left = 48.0
@@ -69,16 +102,31 @@ layout_mode = 2
 text = "三"
 
 [node name="FloatHint" type="PanelContainer" parent="UILayer"]
-self_modulate = Color(18.892157, 18.892157, 7.271375, 1)
-offset_left = 69.0
-offset_top = -306.0
-offset_right = 169.0
-offset_bottom = -204.0
+anchors_preset = -1
+anchor_left = 0.10700001
+anchor_top = -0.531
+anchor_right = 0.28500003
+anchor_bottom = -0.36900002
+offset_left = 8.215996
+offset_top = -0.12799072
+offset_right = 0.07998657
+offset_bottom = -0.07199097
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7mycd")
+
+[node name="FloatIcon" type="TextureRect" parent="UILayer/FloatHint"]
+layout_mode = 2
+texture = ExtResource("4_1bvp3")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="HintLabel" type="Label" parent="UILayer/FloatHint"]
 layout_mode = 2
 size_flags_vertical = 8
-theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 7
 theme_override_font_sizes/font_size = 11
 text = "新物品"
 horizontal_alignment = 1

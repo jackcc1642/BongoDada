@@ -4,13 +4,13 @@ extends Control
 @onready var pony_avatar: TextureRect = $PonyAvatar
 
 #【UI节点引用】
-@onready var hit_counter: Label = $UILayer/BottomBar/HitCounter
+@onready var hit_counter: Button = $UILayer/BottomBar/HitCounter
 @onready var menu_btn: Button = $UILayer/BottomBar/MenuBtn
 
 @onready var unlock_bubble: Button = $UILayer/UnlockBUbble
 @onready var item_icon: TextureRect = $UILayer/UnlockBUbble/ItemIcon
 
-@onready var float_int: PanelContainer = $UILayer/FloatHint
+@onready var float_hint: PanelContainer = $UILayer/FloatHint
 @onready var hint_label: Label = $UILayer/FloatHint/HintLabel
 
 
@@ -54,7 +54,7 @@ func _ready() -> void:
 
 	# 游戏开始时隐藏 UI 控件
 	unlock_bubble.visible = false
-	float_int.visible = false
+	float_hint.visible = false
 	hit_counter.text = str(Config.total_hits)
 
 	# 游戏开始时，绑定气泡点击事件
@@ -97,6 +97,7 @@ func _input(event: InputEvent) -> void:
 
 				# 计步器
 				Config.total_hits += 1
+				hit_counter.text = str(Config.total_hits)
 
 				# 奖励检查
 				check_unlocks()
@@ -110,8 +111,8 @@ func _input(event: InputEvent) -> void:
 #【解锁判定函数】
 func check_unlocks() -> void:
 	# 当前的敲击次数在配置表里
-	if Config.unlcok_config.has(Config.total_hits):
-		var reward_data = Config.unlcok_config[Config.total_hits]
+	if Config.unlock_config.has(Config.total_hits):
+		var reward_data = Config.unlock_config[Config.total_hits]
 
 		# 确保奖励没被领过
 		if not Config.claimed_rewards.has(reward_data.id):
@@ -121,10 +122,14 @@ func check_unlocks() -> void:
 			# 显示气泡和缩略图
 			item_icon.texture = load(reward_data.icon)
 			unlock_bubble.visible = true
+
+			# 设定气泡缩放中心
+			unlock_bubble.pivot_offset = unlock_bubble.size / 2.0
+
 			# 小动画
-			unlock_bubble.scale = Vector2(0.1, 0.1)
+			unlock_bubble.scale = Vector2(0.1, 0.1)		# 初始缩放
 			var tween := create_tween()
-			tween.tween_property(unlock_bubble, "scale", Vector2(1.0, 1.0), 0.3).set_trans(Tween.TRANS_BOUNCE)
+			tween.tween_property(unlock_bubble, "scale", Vector2(1.0, 1.0), 0.4).set_trans(Tween.TRANS_BOUNCE)
 		
 		# 打印到控制台看看效果（后续我们可以把它做成游戏里的弹窗UI）
 		print("达成目标: ", Config.total_hits, "次！")
@@ -132,3 +137,29 @@ func check_unlocks() -> void:
 		print("-----------------------")
 
 #【气泡点击逻辑】
+func _on_unlock_bubble_pressed() -> void:
+	if pending_reward_data == null: return
+
+	# 1. 标记为已领取，存入数组
+	Config.claimed_rewards.append(pending_reward_data.id)
+	Config.unlocked_skins.append(pending_reward_data)
+
+	# 2. 隐藏气泡
+	unlock_bubble.visible = false
+
+	# 3. 展现浮窗
+	hint_label.text = pending_reward_data.name + "已解锁!"
+	float_hint.visible = true
+	# float_hint.position.y = unlock_bubble.position.y - 50
+	float_hint.modulate.a = 1.0
+
+	# 4. 浮窗变透明
+	var tween = create_tween()
+	tween.tween_interval(1.0)	# 等待 1 秒
+	tween.tween_property(float_hint, "modulate:a", 0.0, 1.0)
+	# a - 透明度
+	# 0.0 最终数值
+	# 1.0 1秒
+	tween.tween_callback(func(): float_hint.visible = false) 	# 动画结束后隐藏
+
+	pending_reward_data = null
