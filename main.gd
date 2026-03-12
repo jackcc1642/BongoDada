@@ -2,6 +2,7 @@ extends Control
 
 # 引用小马节点
 @onready var pony_avatar: TextureRect = $PonyAvatar
+@onready var static_base: TextureRect = $StaticBase
 
 #【UI节点引用】
 @onready var hit_counter: Button = $UILayer/BottomBar/HitCounter
@@ -20,18 +21,16 @@ var pending_reward_data = null
 
 #【皮肤纹理引用 - 为拓展做准备】
 # 预加载防止切换时卡顿
-# 如果后续增加新皮肤，只需要在此定义 xxx_hands1, xxx_hands2 即可
-var pony_hands1 = preload("res://assets/images/pony_hands11.png")
-var pony_hands2 = preload("res://assets/images/pony_hands22.png")
-var pony_keyboard = preload("res://assets/images/pony_keyboard.png")
+
 
 
 #【当前皮肤状态】
 # 默认使用第一套皮肤
-var current_skin_hands1 = pony_hands1
-var current_skin_hands2 = pony_hands2
-var current_skin_keyboards = pony_keyboard
-
+var current_skin_hands1 = Texture2D
+var current_skin_hands2 = Texture2D
+var current_skin_keyboards = Texture2D
+# 记录基础缩放值
+var base_avatar_scale: Vector2 = Vector2(1.0, 1.0)
 
 #【新增】记录当前是不是 hands1 状态
 var is_hands1: bool = true
