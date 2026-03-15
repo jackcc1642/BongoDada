@@ -1,3 +1,4 @@
+## Config.gd
 extends Node
 
 
@@ -36,14 +37,14 @@ var skins = {
 
 		# 2. 独立参数调优
 		# 小马身体参数
-		"avatar_offest": Vector2(0, 0),
+		"avatar_offset": Vector2(0, 0),
 		"avatar_scale": Vector2(1.0, 1.0),
 		"avatar_rotation": 0.0, 	# 角度
 		
 		# 键盘微调
 		"keyboard_offset": Vector2(0, 0),
 		"keyboard_scale": Vector2(1.0, 1.0),
-		"keyboard_rotation": 0.0
+		"keyboard_rotation": 2.1
 	},
 	"skin_pony_lv2":{
 		"name": "小马进化2",
@@ -51,7 +52,7 @@ var skins = {
 		"hands2": "res://assets/images/pony_hands22.png",
 		"keyboard": "res://assets/images/pony_keyboard.png",
 
-		"avatar_offest": Vector2(0, 0),
+		"avatar_offset": Vector2(0, 0),
 		"avatar_scale": Vector2(1.0, 1.0),
 		"avatar_rotation": 0.0, 	# 角度
 

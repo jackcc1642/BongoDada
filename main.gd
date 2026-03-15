@@ -1,3 +1,4 @@
+## main.gd
 extends Control
 
 # 引用小马节点
@@ -25,12 +26,16 @@ var pending_reward_data = null
 
 
 #【当前皮肤状态】
-# 默认使用第一套皮肤
-var current_skin_hands1 = Texture2D
-var current_skin_hands2 = Texture2D
-var current_skin_keyboards = Texture2D
+# 默认使用第一套皮肤,动态变量
+var current_skin_hands1: Texture2D
+var current_skin_hands2: Texture2D
+var current_skin_keyboard: Texture2D
 # 记录基础缩放值
 var base_avatar_scale: Vector2 = Vector2(1.0, 1.0)
+
+# 记录编辑器初始位置
+var base_avatar_pos: Vector2
+var base_keyboard_pos: Vector2
 
 #【新增】记录当前是不是 hands1 状态
 var is_hands1: bool = true
@@ -46,10 +51,9 @@ var min_visual_time: float = 0.03
 
 
 func _ready() -> void:
-	# 游戏开始时的发呆状态
-	pony_avatar.texture = current_skin_hands1
-	# 把小马形变的中心点放在底部中间，这样下压的时候，底部会固定在屏幕边缘
-	pony_avatar.pivot_offset = Vector2(pony_avatar.size.x / 2.0, pony_avatar.size.y)
+	# 在修改前，先记录编辑器里的原始坐标
+	base_avatar_pos = pony_avatar.position
+	base_keyboard_pos = static_base.position
 
 	# 游戏开始时隐藏 UI 控件
 	unlock_bubble.visible = false
@@ -59,7 +63,47 @@ func _ready() -> void:
 	# 游戏开始时，绑定气泡点击事件
 	unlock_bubble.pressed.connect(_on_unlock_bubble_pressed)
 
+	# 游戏开始时，读取 Config 里的当前皮肤并应用
+	change_skin(Config.current_skin_id)
 
+	# 游戏开始时的发呆状态
+	pony_avatar.texture = current_skin_hands1
+	# 把小马形变的中心点放在底部中间，这样下压的时候，底部会固定在屏幕边缘
+	pony_avatar.pivot_offset = Vector2(pony_avatar.size.x / 2.0, pony_avatar.size.y)
+
+func change_skin(skin_id: String) -> void:
+	if not Config.skins.has(skin_id): return
+	
+	var skin_data = Config.skins[skin_id]
+
+	# 1. 动态加载图片资源
+	current_skin_hands1 = load(skin_data.hands1)
+	current_skin_hands2 = load(skin_data.hands2)
+	static_base.texture = load(skin_data.keyboard)
+
+	pony_avatar.texture = current_skin_hands1
+	is_hands1 = true
+
+	# 2. 应用独立参数
+	# 键盘参数
+	static_base.position = base_keyboard_pos + skin_data.keyboard_offset
+	static_base.scale = skin_data.keyboard_scale
+	static_base.rotation_degrees = skin_data.keyboard_rotation
+
+	# 小马参数
+	pony_avatar.position = base_avatar_pos+ skin_data.avatar_offset
+	pony_avatar.rotation_degrees = skin_data.avatar_rotation
+
+	base_avatar_scale = skin_data.avatar_scale
+	pony_avatar.scale = base_avatar_scale
+	
+	
+
+	# 重新计算中心点
+	pony_avatar.pivot_offset = Vector2(current_skin_hands1.get_width() / 2.0, current_skin_hands1.get_height())
+	var kb_tex = static_base.texture
+	if kb_tex != null:
+		static_base.pivot_offset = Vector2(kb_tex.get_width() / 2.0, kb_tex.get_height())
 
 func _process(delta: float) -> void:
 	# 1. 处理视觉保护期倒计时
@@ -71,8 +115,8 @@ func _process(delta: float) -> void:
 		if idle_timer <= 0:
 			# 倒计时结束，强制回到 IDLE 状态
 			is_hands1 = true
-			pony_avatar.texture = pony_hands1
-			pony_avatar.scale = Vector2(1.0, 1.0)
+			pony_avatar.texture = current_skin_hands1
+			pony_avatar.scale = base_avatar_scale
 
 func _input(event: InputEvent) -> void:
 	# 1. 退出通道
@@ -87,9 +131,9 @@ func _input(event: InputEvent) -> void:
 				is_hands1 = !is_hands1
 
 				if is_hands1:
-					pony_avatar.texture = pony_hands1
+					pony_avatar.texture = current_skin_hands1
 				else:
-					pony_avatar.texture = pony_hands2
+					pony_avatar.texture = current_skin_hands2
 				
 				# 重置视觉保护器，锁定当前状态
 				visual_cooldown = min_visual_time
@@ -103,7 +147,10 @@ func _input(event: InputEvent) -> void:
 
 			# 每次敲击都要重置 idle 倒计时
 			idle_timer = idle_delay
-			pony_avatar.scale = Vector2(1.05, 0.9)
+			
+			# 在 base_avatar_scale 的基础上做出挤压和形变
+			var squash_y = randf_range(0.92, 0.96)
+			pony_avatar.scale = Vector2(base_avatar_scale.x, base_avatar_scale.y * squash_y)
 
 
 
@@ -141,7 +188,7 @@ func _on_unlock_bubble_pressed() -> void:
 
 	# 1. 标记为已领取，存入数组
 	Config.claimed_rewards.append(pending_reward_data.id)
-	Config.unlocked_skins.append(pending_reward_data)
+	Config.unlocked_skins.append(pending_reward_data.id)
 
 	# 2. 隐藏气泡
 	unlock_bubble.visible = false
