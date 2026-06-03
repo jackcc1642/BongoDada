@@ -24,7 +24,6 @@ var pending_reward_data = null
 # 预加载防止切换时卡顿
 
 
-
 #【当前皮肤状态】
 # 默认使用第一套皮肤,动态变量
 var current_skin_hands1: Texture2D
@@ -42,7 +41,7 @@ var is_hands1: bool = true
 #【新增】停止敲击多长时间后，强制回到 IDLE 状态
 var idle_timer: float = 0.0
 ## 0.15秒不敲键盘就回到 hands1
-var idle_delay: float = 0.15 
+var idle_delay: float = 0.15
 
 #【新增】视觉保护器倒计时，防止同一帧内来回乱切
 var visual_cooldown: float = 0.0
@@ -91,14 +90,13 @@ func change_skin(skin_id: String) -> void:
 	static_base.rotation_degrees = skin_data.keyboard_rotation
 
 	# 小马参数
-	pony_avatar.position = base_avatar_pos+ skin_data.avatar_offset
+	pony_avatar.position = base_avatar_pos + skin_data.avatar_offset
 	pony_avatar.rotation_degrees = skin_data.avatar_rotation
 
 	base_avatar_scale = skin_data.avatar_scale
 	pony_avatar.scale = base_avatar_scale
 	
 	
-
 	# 重新计算中心点
 	pony_avatar.pivot_offset = Vector2(current_skin_hands1.get_width() / 2.0, current_skin_hands1.get_height())
 	var kb_tex = static_base.texture
@@ -127,7 +125,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and not event.is_echo():
 		if event.is_pressed():
 			# 只有过了视觉保护期，才允许翻转状态
-			if  visual_cooldown <= 0:
+			if visual_cooldown <= 0:
 				is_hands1 = !is_hands1
 
 				if is_hands1:
@@ -153,7 +151,6 @@ func _input(event: InputEvent) -> void:
 			pony_avatar.scale = Vector2(base_avatar_scale.x, base_avatar_scale.y * squash_y)
 
 
-
 #【解锁判定函数】
 func check_unlocks() -> void:
 	# 当前的敲击次数在配置表里
@@ -173,7 +170,7 @@ func check_unlocks() -> void:
 			unlock_bubble.pivot_offset = unlock_bubble.size / 2.0
 
 			# 小动画
-			unlock_bubble.scale = Vector2(0.1, 0.1)		# 初始缩放
+			unlock_bubble.scale = Vector2(0.1, 0.1) # 初始缩放
 			var tween := create_tween()
 			tween.tween_property(unlock_bubble, "scale", Vector2(1.0, 1.0), 0.4).set_trans(Tween.TRANS_BOUNCE)
 		
@@ -189,6 +186,9 @@ func _on_unlock_bubble_pressed() -> void:
 	# 1. 标记为已领取，存入数组
 	Config.claimed_rewards.append(pending_reward_data.id)
 	Config.unlocked_skins.append(pending_reward_data.id)
+	# 切换领取的皮肤ID，并实装
+	Config.current_skin_id = pending_reward_data.id
+	change_skin(Config.current_skin_id)
 
 	# 2. 隐藏气泡
 	unlock_bubble.visible = false
@@ -201,11 +201,11 @@ func _on_unlock_bubble_pressed() -> void:
 
 	# 4. 浮窗变透明
 	var tween = create_tween()
-	tween.tween_interval(1.0)	# 等待 1 秒
+	tween.tween_interval(1.0) # 等待 1 秒
 	tween.tween_property(float_hint, "modulate:a", 0.0, 1.0)
 	# a - 透明度
 	# 0.0 最终数值
 	# 1.0 1秒
-	tween.tween_callback(func(): float_hint.visible = false) 	# 动画结束后隐藏
+	tween.tween_callback(func(): float_hint.visible = false) # 动画结束后隐藏
 
 	pending_reward_data = null
