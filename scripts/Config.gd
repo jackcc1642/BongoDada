@@ -1,6 +1,8 @@
 ## Config.gd
 extends Node
 
+# 存档文件
+const SAVE_PATH := "user://bongodada_save.json"
 
 # 玩家数据
 var total_hits: int = 0
@@ -77,3 +79,37 @@ var skins = {
 
 # 记录当前正在使用的皮肤 ID
 var current_skin_id: String = "base_pony"
+
+# 存档功能
+func save_game() -> void:
+	var save_data = {
+		"total_hits": total_hits,
+		"unlocked_skins": unlocked_skins,
+		"claimed_rewards": claimed_rewards,
+		"current_skin_id": current_skin_id
+	}
+
+	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_warning("存档写入失败")
+		return
+	file.store_string(JSON.stringify(save_data))
+
+# 读档功能
+func load_game() -> void:
+	if not FileAccess.file_exists(SAVE_PATH):
+		return
+	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
+	if file == null:
+		push_warning("存档读取失败")
+		return
+
+	var save_data = JSON.parse_string(file.get_as_text())
+	if typeof(save_data) != TYPE_DICTIONARY:
+		push_warning("存档格式错误，使用默认数据")
+		return
+
+	total_hits = save_data.get("total_hits", 0)
+	unlocked_skins = save_data.get("unlocked_skins", ["base_pony"])
+	claimed_rewards = save_data.get("claimed_rewards", [])
+	current_skin_id = save_data.get("current_skin_id", "base_pony")

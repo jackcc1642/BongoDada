@@ -50,6 +50,7 @@ var min_visual_time: float = 0.03
 
 
 func _ready() -> void:
+	Config.load_game()
 	# 在修改前，先记录编辑器里的原始坐标
 	base_avatar_pos = pony_avatar.position
 	base_keyboard_pos = static_base.position
@@ -64,6 +65,7 @@ func _ready() -> void:
 
 	# 游戏开始时，读取 Config 里的当前皮肤并应用
 	change_skin(Config.current_skin_id)
+	check_unlocks()
 
 	# 游戏开始时的发呆状态
 	pony_avatar.texture = current_skin_hands1
@@ -71,8 +73,8 @@ func _ready() -> void:
 	pony_avatar.pivot_offset = Vector2(pony_avatar.size.x / 2.0, pony_avatar.size.y)
 
 func change_skin(skin_id: String) -> void:
-	if not Config.skins.has(skin_id): return
-	
+	if not Config.skins.has(skin_id):
+		return
 	var skin_data = Config.skins[skin_id]
 
 	# 1. 动态加载图片资源
@@ -138,6 +140,7 @@ func _input(event: InputEvent) -> void:
 
 				# 计步器
 				Config.total_hits += 1
+				Config.save_game()
 				hit_counter.text = str(Config.total_hits)
 
 				# 奖励检查
@@ -154,31 +157,27 @@ func _input(event: InputEvent) -> void:
 #【解锁判定函数】
 func check_unlocks() -> void:
 	# 当前的敲击次数在配置表里
-	if Config.unlock_config.has(Config.total_hits):
-		var reward_data = Config.unlock_config[Config.total_hits]
+	for need_hits in Config.unlock_config.keys():
+		if Config.total_hits < need_hits:
+			continue
+		var reward_data = Config.unlock_config[need_hits]
+		if Config.claimed_rewards.has(reward_data.id):
+			continue
+		pending_reward_data = reward_data
 
-		# 确保奖励没被领过
-		if not Config.claimed_rewards.has(reward_data.id):
-			# 记录当前待领取的奖励
-			pending_reward_data = reward_data
+		item_icon.texture = load(reward_data.icon)
+		unlock_bubble.visible = true
+		unlock_bubble.pivot_offset = unlock_bubble.size / 2.0
 
-			# 显示气泡和缩略图
-			item_icon.texture = load(reward_data.icon)
-			unlock_bubble.visible = true
-
-			# 设定气泡缩放中心
-			unlock_bubble.pivot_offset = unlock_bubble.size / 2.0
-
-			# 小动画
-			unlock_bubble.scale = Vector2(0.1, 0.1) # 初始缩放
-			var tween := create_tween()
-			tween.tween_property(unlock_bubble, "scale", Vector2(1.0, 1.0), 0.4).set_trans(Tween.TRANS_BOUNCE)
-		
-		# 打印到控制台看看效果（后续我们可以把它做成游戏里的弹窗UI）
-		print("达成目标: ", Config.total_hits, "次！")
+		unlock_bubble.scale = Vector2(0.1, 0.1)
+		var tween := create_tween()
+		tween.tween_property(unlock_bubble, "scale", Vector2(1.0, 1.0), 0.4).set_trans(Tween.TRANS_BOUNCE)
+		print("达成目标: ", need_hits, "次！")
 		print("获得奖励: ", reward_data.get("reward_type"), reward_data.get("name"))
 		print("-----------------------")
 
+		return
+	
 #【气泡点击逻辑】
 func _on_unlock_bubble_pressed() -> void:
 	if pending_reward_data == null: return
@@ -189,6 +188,7 @@ func _on_unlock_bubble_pressed() -> void:
 	# 切换领取的皮肤ID，并实装
 	Config.current_skin_id = pending_reward_data.id
 	change_skin(Config.current_skin_id)
+	Config.save_game()
 
 	# 2. 隐藏气泡
 	unlock_bubble.visible = false
