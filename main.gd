@@ -9,6 +9,10 @@ extends Control
 @onready var hit_counter: Button = $UILayer/BottomBar/HitCounter
 @onready var menu_btn: Button = $UILayer/BottomBar/MenuBtn
 
+@onready var menu_panel: PanelContainer = $UILayer/MenuPanel
+@onready var menu_hits_label: Label = $UILayer/MenuPanel/VBoxContainer/MenuHitsLabel
+@onready var skin_switch_btn: Button = $UILayer/MenuPanel/VBoxContainer/SkinSwitchBtn
+
 @onready var unlock_bubble: Button = $UILayer/UnlockBUbble
 @onready var item_icon: TextureRect = $UILayer/UnlockBUbble/ItemIcon
 
@@ -60,8 +64,10 @@ func _ready() -> void:
 	float_hint.visible = false
 	hit_counter.text = str(Config.total_hits)
 
-	# 游戏开始时，绑定气泡点击事件
+	# 游戏开始时，绑定点击事件
 	unlock_bubble.pressed.connect(_on_unlock_bubble_pressed)
+	menu_btn.pressed.connect(_on_menu_btn_pressed)
+	skin_switch_btn.pressed.connect(_on_skin_switch_btn_pressed)
 
 	# 游戏开始时，读取 Config 里的当前皮肤并应用
 	change_skin(Config.current_skin_id)
@@ -142,6 +148,8 @@ func _input(event: InputEvent) -> void:
 				Config.total_hits += 1
 				Config.save_game()
 				hit_counter.text = str(Config.total_hits)
+				if menu_panel.visible:
+					refresh_menu()
 
 				# 奖励检查
 				check_unlocks()
@@ -209,3 +217,27 @@ func _on_unlock_bubble_pressed() -> void:
 	tween.tween_callback(func(): float_hint.visible = false) # 动画结束后隐藏
 
 	pending_reward_data = null
+
+func _on_menu_btn_pressed() -> void:
+	menu_panel.visible = not menu_panel.visible
+	if menu_panel.visible:
+		refresh_menu()
+
+func refresh_menu() -> void:
+	menu_hits_label.text = "敲击次数：" + str(Config.total_hits)
+
+func _on_skin_switch_btn_pressed() -> void:
+	var skin_count = Config.unlocked_skins.size()
+	if skin_count <= 0:
+		return
+	var current_index = Config.unlocked_skins.find(Config.current_skin_id)
+	if current_index == -1:
+		current_index = 0
+	var next_index = current_index + 1
+	if next_index >= skin_count:
+		next_index = 0
+	
+	Config.current_skin_id = Config.unlocked_skins[next_index]
+	change_skin(Config.current_skin_id)
+	Config.save_game()
+	refresh_menu()

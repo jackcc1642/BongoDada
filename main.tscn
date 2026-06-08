@@ -130,3 +130,30 @@ theme_override_font_sizes/font_size = 11
 text = "新物品"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="MenuPanel" type="PanelContainer" parent="UILayer"]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = -159.0
+offset_right = -348.0
+offset_bottom = -511.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UILayer/MenuPanel"]
+layout_mode = 2
+
+[node name="MenuTitle" type="Label" parent="UILayer/MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "菜单"
+
+[node name="MenuHitsLabel" type="Label" parent="UILayer/MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "敲击次数：0"
+
+[node name="SkinSwitchBtn" type="Button" parent="UILayer/MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "切换皮肤"
