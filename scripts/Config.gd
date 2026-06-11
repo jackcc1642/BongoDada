@@ -8,7 +8,7 @@ const SAVE_PATH := "user://bongodada_save.json"
 var total_hits: int = 0
 var unlocked_skins: Array = ["base_pony"] # 默认已拥有的皮肤
 var claimed_rewards: Array = [] # 记录已经点过气泡领取的奖励，避免重复弹
-
+var current_skin_id: String = "base_pony"
 
 # 策划配表
 var unlock_config = {
@@ -77,9 +77,6 @@ var skins = {
 	}
 }
 
-# 记录当前正在使用的皮肤 ID
-var current_skin_id: String = "base_pony"
-
 # 存档功能
 func save_game() -> void:
 	var save_data = {
@@ -113,3 +110,11 @@ func load_game() -> void:
 	unlocked_skins = save_data.get("unlocked_skins", ["base_pony"])
 	claimed_rewards = save_data.get("claimed_rewards", [])
 	current_skin_id = save_data.get("current_skin_id", "base_pony")
+
+# 重置功能
+func reset_player_data() -> void:
+	total_hits = 0
+	unlocked_skins = ["base_pony"]
+	claimed_rewards = []
+	current_skin_id = "base_pony"
+	save_game()

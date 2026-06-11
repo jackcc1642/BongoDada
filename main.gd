@@ -11,7 +11,10 @@ extends Control
 
 @onready var menu_panel: PanelContainer = $UILayer/MenuPanel
 @onready var menu_hits_label: Label = $UILayer/MenuPanel/VBoxContainer/MenuHitsLabel
+@onready var current_skin_label: Label = $UILayer/MenuPanel/VBoxContainer/CurrentSkinLabel
 @onready var skin_switch_btn: Button = $UILayer/MenuPanel/VBoxContainer/SkinSwitchBtn
+@onready var reset_save_btn: Button = $UILayer/MenuPanel/VBoxContainer/ResetSaveBtn
+@onready var reset_confirm_dialog: ConfirmationDialog = $UILayer/ResetConfirmDialog
 
 @onready var unlock_bubble: Button = $UILayer/UnlockBUbble
 @onready var item_icon: TextureRect = $UILayer/UnlockBUbble/ItemIcon
@@ -68,6 +71,8 @@ func _ready() -> void:
 	unlock_bubble.pressed.connect(_on_unlock_bubble_pressed)
 	menu_btn.pressed.connect(_on_menu_btn_pressed)
 	skin_switch_btn.pressed.connect(_on_skin_switch_btn_pressed)
+	reset_save_btn.pressed.connect(_on_reset_save_btn_pressed)
+	reset_confirm_dialog.confirmed.connect(_on_reset_confirm_dialog_confirmed)
 
 	# 游戏开始时，读取 Config 里的当前皮肤并应用
 	change_skin(Config.current_skin_id)
@@ -225,6 +230,10 @@ func _on_menu_btn_pressed() -> void:
 
 func refresh_menu() -> void:
 	menu_hits_label.text = "敲击次数：" + str(Config.total_hits)
+	
+	var skin_data = Config.skins.get(Config.current_skin_id, {})
+	var skin_name = skin_data.get("name", Config.current_skin_id)
+	current_skin_label.text = "当前皮肤：" + skin_name
 
 func _on_skin_switch_btn_pressed() -> void:
 	var skin_count = Config.unlocked_skins.size()
@@ -240,4 +249,15 @@ func _on_skin_switch_btn_pressed() -> void:
 	Config.current_skin_id = Config.unlocked_skins[next_index]
 	change_skin(Config.current_skin_id)
 	Config.save_game()
+	refresh_menu()
+
+func _on_reset_save_btn_pressed() -> void:
+	reset_confirm_dialog.popup_centered()
+
+func _on_reset_confirm_dialog_confirmed() -> void:
+	Config.reset_player_data()
+	change_skin(Config.current_skin_id)
+	hit_counter.text = str(Config.total_hits)
+	unlock_bubble.visible = false
+	pending_reward_data = null
 	refresh_menu()

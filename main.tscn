@@ -154,6 +154,20 @@ text = "菜单"
 layout_mode = 2
 text = "敲击次数：0"
 
+[node name="CurrentSkinLabel" type="Label" parent="UILayer/MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "当前皮肤：经典小马"
+
 [node name="SkinSwitchBtn" type="Button" parent="UILayer/MenuPanel/VBoxContainer"]
 layout_mode = 2
 text = "切换皮肤"
+
+[node name="ResetSaveBtn" type="Button" parent="UILayer/MenuPanel/VBoxContainer"]
+layout_mode = 2
+text = "重置存档"
+
+[node name="ResetConfirmDialog" type="ConfirmationDialog" parent="UILayer"]
+title = "重置确认"
+ok_button_text = "确认"
+dialog_text = "确定要重置存档吗？"
+cancel_button_text = "取消"
