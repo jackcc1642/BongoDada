@@ -111,7 +111,7 @@ func change_skin(skin_id: String) -> void:
 	
 	
 	# 重新计算中心点
-	pony_avatar.pivot_offset = Vector2(current_skin_hands1.get_width() / 2.0, current_skin_hands1.get_height())
+	pony_avatar.pivot_offset = Vector2(pony_avatar.size.x / 2.0, pony_avatar.size.y)
 	var kb_tex = static_base.texture
 	if kb_tex != null:
 		static_base.pivot_offset = Vector2(kb_tex.get_width() / 2.0, kb_tex.get_height())

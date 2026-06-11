@@ -45,7 +45,7 @@ var skins = {
 		# 键盘微调
 		"keyboard_offset": Vector2(0, 0),
 		"keyboard_scale": Vector2(1.0, 1.0),
-		"keyboard_rotation": 2.1
+		"keyboard_rotation": 0
 	},
 	"skin_pony_lv2": {
 		"name": "小马进化2",
